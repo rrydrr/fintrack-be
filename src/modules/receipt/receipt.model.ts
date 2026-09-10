@@ -37,14 +37,11 @@ export const ReceiptDataModel = t.Object({
 });
 
 export const ExtractReceiptBodyModel = t.Object({
-  image: t.Union([
-    t.File({
-      description: "Receipt image file (JPEG, PNG, WEBP)",
-    }),
-    t.String({
-      description: "Base64 data URL or raw base64 string",
-    }),
-  ]),
+  image: t.File({
+    type: ["image/jpeg", "image/png", "image/webp"],
+    maxSize: "10m",
+    description: "Receipt image file (JPEG, PNG, or WEBP, max 10MB)",
+  }),
 });
 
 export const ExtractReceiptResponseModel = t.Object({

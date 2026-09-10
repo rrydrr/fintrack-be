@@ -8,7 +8,14 @@ import { authController } from "./modules/auth/auth.controller";
 
 export const app = new Elysia()
   // Global Middlewares
-  .use(cors())
+  .use(
+    cors({
+      origin: config.corsOrigin.includes(",")
+        ? config.corsOrigin.split(",").map((s) => s.trim())
+        : config.corsOrigin,
+      credentials: true,
+    })
+  )
   .use(
     swagger({
       documentation: {
@@ -23,11 +30,11 @@ export const app = new Elysia()
         ],
         components: {
           securitySchemes: {
-            bearerAuth: {
-              type: "http",
-              scheme: "bearer",
-              bearerFormat: "JWT",
-              description: "Enter your JWT token obtained from /auth/login or /auth/register",
+            cookieAuth: {
+              type: "apiKey",
+              in: "cookie",
+              name: "accessToken",
+              description: "Session access token automatically set in HttpOnly cookie upon login or registration",
             },
           },
         },

@@ -85,10 +85,9 @@ The server will be running at:
 
 ### 1. Extract Receipt Data
 - **Endpoint:** `POST /receipts/extract`
-- **Accepts:**
-  - `multipart/form-data`: `image` (file upload)
-  - `application/json`: `image` (base64 data URL or raw base64 string)
-- **Optional:** `apiKey` override (uses `ROUTER_API_KEY` from `.env` by default)
+- **Content-Type:** `multipart/form-data`
+- **Field:** `image` (binary file upload: JPEG, PNG, or WEBP; max 10MB)
+- **Optional Header:** `x-api-key` override (uses `ROUTER_API_KEY` from `.env` by default)
 
 **cURL Example (File Upload):**
 ```bash
@@ -96,13 +95,17 @@ curl -X POST http://localhost:3000/receipts/extract \
   -F "image=@/path/to/receipt.jpg"
 ```
 
-**cURL Example (Base64 JSON):**
-```bash
-curl -X POST http://localhost:3000/receipts/extract \
-  -H "Content-Type: application/json" \
-  -d '{
-    "image": "data:image/jpeg;base64,/9j/4AAQSkZJRg..."
-  }'
+**JavaScript / Fetch Example (Web Frontend):**
+```javascript
+const formData = new FormData();
+formData.append("image", fileInput.files[0]);
+
+const response = await fetch("http://localhost:3000/receipts/extract", {
+  method: "POST",
+  body: formData,
+  credentials: "include",
+});
+const data = await response.json();
 ```
 
 **Response Format:**
@@ -142,9 +145,18 @@ curl -X POST http://localhost:3000/receipts/extract \
 }
 ```
 
-### 2. List Saved Receipts
-- **Endpoint:** `GET /receipts`
-- **Description:** Returns all parsed receipts and their full raw AI responses stored in PostgreSQL.
+### 2. Receipts API
+- **Extract Receipt:** `POST /receipts/extract` (multipart/form-data or JSON base64)
+- **List Receipts:** `GET /receipts?page=1&limit=10` (paginated list of user receipts)
+- **Get Receipt by ID:** `GET /receipts/:id` (single receipt by UUID)
+
+### 3. Authentication & Cookies
+- **Register:** `POST /auth/register` (sets `accessToken` & `refreshToken` in `HttpOnly` cookies; returns user profile)
+- **Login:** `POST /auth/login` (sets `accessToken` & `refreshToken` in `HttpOnly` cookies; returns user profile)
+- **Refresh:** `POST /auth/refresh` (rotates `refreshToken` cookie and issues new cookies; returns success confirmation)
+- **Logout:** `POST /auth/logout` (revokes active `refreshToken` and clears cookies via `Max-Age=0`)
+- **Profile:** `GET /auth/me` (reads `accessToken` from cookie or `Authorization: Bearer <token>`)
+
 
 ---
 

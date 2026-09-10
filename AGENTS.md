@@ -27,7 +27,9 @@ src/
 ├── db/
 │   ├── schema/
 │   │   ├── index.ts           # Schema re-exports
+│   │   ├── invite-codes.ts    # Invite codes table schema & types
 │   │   ├── receipts.ts        # Receipts table schema & types
+│   │   ├── refresh-tokens.ts  # Refresh tokens table schema & types
 │   │   └── users.ts           # Users table schema & types
 │   └── index.ts               # Drizzle ORM & Postgres client connection
 ├── modules/
@@ -44,7 +46,8 @@ src/
 │   └── db-seed.ts             # Database seeding utility (placeholder)
 ├── utils/
 │   ├── image.ts               # Image & media utilities (Data URL conversion)
-│   └── logger.ts              # Custom pretty rotating file logger
+│   ├── logger.ts              # Custom pretty rotating file logger
+│   └── rate-limiter.ts        # Native sliding-window rate limiter utility
 └── index.ts                   # App composition root (plugins, hooks, global errors)
 ```
 

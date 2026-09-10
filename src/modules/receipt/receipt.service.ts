@@ -11,7 +11,7 @@ export class ReceiptService {
    * Forwards receipt image to AI endpoint and saves parsed result with user ownership.
    */
   public async extractReceipt(
-    imageInput: File | Blob | string,
+    imageInput: File | Blob,
     userId: string,
     customApiKey?: string
   ) {
@@ -35,43 +35,56 @@ export class ReceiptService {
 
     logger.info("Forwarding receipt image to AI router...", { userId });
 
-    const response = await fetch(endpoint, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-        "x-api-key": apiKey,
-      },
-      body: JSON.stringify({
-        model: "Hermes",
-        stream: false,
-        temperature: 0.1,
-        response_format: {
-          type: "json_object",
+    let response: Response;
+    try {
+      response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`,
+          "x-api-key": apiKey,
         },
-        messages: [
-          {
-            role: "system",
-            content: RECEIPT_SYSTEM_PROMPT,
+        body: JSON.stringify({
+          model: "Hermes",
+          stream: false,
+          temperature: 0.1,
+          response_format: {
+            type: "json_object",
           },
-          {
-            role: "user",
-            content: [
-              {
-                type: "text",
-                text: RECEIPT_USER_PROMPT,
-              },
-              {
-                type: "image_url",
-                image_url: {
-                  url: imageUrl,
+          messages: [
+            {
+              role: "system",
+              content: RECEIPT_SYSTEM_PROMPT,
+            },
+            {
+              role: "user",
+              content: [
+                {
+                  type: "text",
+                  text: RECEIPT_USER_PROMPT,
                 },
-              },
-            ],
-          },
-        ],
-      }),
-    });
+                {
+                  type: "image_url",
+                  image_url: {
+                    url: imageUrl,
+                  },
+                },
+              ],
+            },
+          ],
+        }),
+      });
+    } catch (networkErr: any) {
+      logger.error("Failed to connect to upstream AI router", {
+        endpoint,
+        error: networkErr.message || networkErr,
+      });
+      const error: any = new Error(
+        `Upstream AI router (${endpoint}) is unreachable: ${networkErr.message || "Connection refused"}`
+      );
+      error.status = 502;
+      throw error;
+    }
 
     if (!response.ok) {
       const errorText = await response.text();
