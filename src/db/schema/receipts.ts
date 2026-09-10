@@ -1,13 +1,16 @@
 import { pgTable, uuid, text, numeric, jsonb, timestamp } from "drizzle-orm/pg-core";
+import { users } from "./users";
 
 export const receipts = pgTable("receipts", {
   id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id")
+    .references(() => users.id, { onDelete: "cascade" })
+    .notNull(),
   merchantName: text("merchant_name"),
   transactionDate: text("transaction_date"),
   totalAmount: numeric("total_amount", { precision: 12, scale: 2 }),
   currency: text("currency"),
   parsedData: jsonb("parsed_data"),
-  rawResponse: jsonb("raw_response"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()

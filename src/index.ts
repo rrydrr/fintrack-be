@@ -4,6 +4,7 @@ import { swagger } from "@elysiajs/swagger";
 import { config } from "./config/env";
 import { logger } from "./utils/logger";
 import { receiptController } from "./modules/receipt/receipt.controller";
+import { authController } from "./modules/auth/auth.controller";
 
 export const app = new Elysia()
   // Global Middlewares
@@ -12,11 +13,24 @@ export const app = new Elysia()
     swagger({
       documentation: {
         info: {
-          title: "FinTrack Receipt Extraction API",
+          title: "FinTrack Receipt & Financial API",
           version: "1.0.0",
-          description: "AI-powered receipt data extraction service using ElysiaJS and Bun",
+          description: "AI-powered receipt data extraction and financial tracking service using ElysiaJS and Bun",
         },
-        tags: [{ name: "Receipts", description: "Receipt extraction endpoints" }],
+        tags: [
+          { name: "Auth", description: "User authentication & profile endpoints" },
+          { name: "Receipts", description: "Receipt extraction endpoints" },
+        ],
+        components: {
+          securitySchemes: {
+            bearerAuth: {
+              type: "http",
+              scheme: "bearer",
+              bearerFormat: "JWT",
+              description: "Enter your JWT token obtained from /auth/login or /auth/register",
+            },
+          },
+        },
       },
       path: "/swagger",
     })
@@ -80,17 +94,8 @@ export const app = new Elysia()
     };
   })
 
-  // Root & Health Check
-  .get("/", () => ({
-    name: "FinTrack Backend API",
-    status: "healthy",
-    docs: "/swagger",
-    endpoints: {
-      extractReceipt: "POST /receipts/extract",
-    },
-  }))
-
   // Modules & Controllers
+  .use(authController)
   .use(receiptController)
 
   // Start Server

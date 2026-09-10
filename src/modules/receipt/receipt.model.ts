@@ -45,11 +45,6 @@ export const ExtractReceiptBodyModel = t.Object({
       description: "Base64 data URL or raw base64 string",
     }),
   ]),
-  apiKey: t.Optional(
-    t.String({
-      description: "Optional API Key override. If omitted, uses ROUTER_API_KEY from .env",
-    })
-  ),
 });
 
 export const ExtractReceiptResponseModel = t.Object({
@@ -57,3 +52,11 @@ export const ExtractReceiptResponseModel = t.Object({
   data: t.Optional(ReceiptDataModel),
   error: t.Optional(t.Any()),
 });
+
+export const PaginationModel = t.Object({
+  page: t.Number({ description: "Current page number" }),
+  limit: t.Number({ description: "Number of items per page" }),
+  total: t.Number({ description: "Total number of records" }),
+  totalPages: t.Number({ description: "Total number of pages" }),
+});
+

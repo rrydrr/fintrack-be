@@ -26,12 +26,18 @@ src/
 │   └── prompts.ts             # AI system instructions and JSON schemas
 ├── db/
 │   ├── schema/
-│   │   └── index.ts           # Drizzle table schemas (placeholder)
+│   │   ├── index.ts           # Schema re-exports
+│   │   ├── receipts.ts        # Receipts table schema & types
+│   │   └── users.ts           # Users table schema & types
 │   └── index.ts               # Drizzle ORM & Postgres client connection
 ├── modules/
+│   ├── auth/                  # Authentication & authorization module
+│   │   ├── auth.model.ts      # TypeBox schemas (Register, Login, User)
+│   │   ├── auth.service.ts    # Auth business logic (hashing, verification)
+│   │   └── auth.controller.ts # Elysia auth routes & authPlugin guard (/auth)
 │   └── receipt/               # Receipt extraction domain module
-│       ├── receipt.model.ts      # TypeBox schemas (Request, Response, Entities)
-│       ├── receipt.service.ts    # Business logic & upstream integrations
+│       ├── receipt.model.ts   # TypeBox schemas (Request, Response, Entities)
+│       ├── receipt.service.ts # Business logic & upstream integrations
 │       └── receipt.controller.ts # Elysia route plugin with prefix (/receipts)
 ├── scripts/
 │   ├── db-reset.ts            # Database reset utility (drops all tables)
