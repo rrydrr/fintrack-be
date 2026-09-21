@@ -72,6 +72,7 @@ src/
 │   ├── logger.ts              # Custom pretty rotating file logger
 │   ├── pagination.ts          # Reusable optional pagination models & helper
 │   └── rate-limiter.ts        # Native sliding-window rate limiter utility
+├── client.ts                  # Eden Treaty client factory & App type export for frontend
 └── index.ts                   # App composition root (plugins, hooks, global errors)
 ```
 
