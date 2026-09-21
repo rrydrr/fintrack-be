@@ -42,6 +42,8 @@ export const UserModel = t.Object({
   name: t.String({ description: "User full name" }),
   email: t.String({ description: "User email address" }),
   role: UserRoleModel,
+  emailVerified: t.Boolean({ description: "Whether the user's email is verified" }),
+  emailVerifiedAt: t.Nullable(t.String({ description: "Timestamp when email was verified (ISO string)" })),
 });
 
 export const InviteCodeModel = t.Object({
@@ -108,6 +110,33 @@ export const LogoutResponseModel = t.Object({
 export const MeResponseModel = t.Object({
   success: t.Boolean(),
   data: t.Optional(UserModel),
+  error: t.Optional(t.String()),
+});
+
+export const VerifyEmailBodyModel = t.Object({
+  token: t.String({
+    minLength: 1,
+    description: "Verification token received in the verification email",
+  }),
+});
+
+export const VerifyEmailResponseModel = t.Object({
+  success: t.Boolean(),
+  message: t.Optional(t.String()),
+  data: t.Optional(UserModel),
+  error: t.Optional(t.String()),
+});
+
+export const ResendVerificationBodyModel = t.Object({
+  email: t.String({
+    format: "email",
+    description: "Registered email address to resend verification email to",
+  }),
+});
+
+export const ResendVerificationResponseModel = t.Object({
+  success: t.Boolean(),
+  message: t.Optional(t.String()),
   error: t.Optional(t.String()),
 });
 

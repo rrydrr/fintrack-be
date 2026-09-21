@@ -26,6 +26,7 @@ src/
 │   └── prompts.ts             # AI system instructions and JSON schemas
 ├── db/
 │   ├── schema/
+│   │   ├── email-verification-tokens.ts # Email verification tokens schema & types
 │   │   ├── index.ts           # Schema re-exports
 │   │   ├── invite-codes.ts    # Invite codes table schema & types
 │   │   ├── receipts.ts        # Receipts table schema & types
@@ -45,6 +46,7 @@ src/
 │   ├── db-reset.ts            # Database reset utility (drops all tables)
 │   └── db-seed.ts             # Database seeding utility (placeholder)
 ├── utils/
+│   ├── email.ts               # Transactional email utility (Brevo REST API)
 │   ├── image.ts               # Image & media utilities (Data URL conversion)
 │   ├── logger.ts              # Custom pretty rotating file logger
 │   └── rate-limiter.ts        # Native sliding-window rate limiter utility

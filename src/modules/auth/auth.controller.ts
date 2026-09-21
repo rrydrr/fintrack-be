@@ -14,6 +14,10 @@ import {
   CreateInviteResponseModel,
   ListInvitesResponseModel,
   RevokeInviteResponseModel,
+  VerifyEmailBodyModel,
+  VerifyEmailResponseModel,
+  ResendVerificationBodyModel,
+  ResendVerificationResponseModel,
 } from "./auth.model";
 
 
@@ -154,6 +158,8 @@ export async function verifyAuth(
     name: (payload.name as string) || "",
     email: (payload.email as string) || "",
     role: (payload.role as UserRole) || "user",
+    emailVerified: Boolean(payload.emailVerified),
+    emailVerifiedAt: (payload.emailVerifiedAt as string) || null,
   };
 }
 
@@ -248,6 +254,8 @@ export const authController = new Elysia({ prefix: "/auth" })
           name: user.name,
           email: user.email,
           role: user.role,
+          emailVerified: user.emailVerified,
+          emailVerifiedAt: user.emailVerifiedAt,
         });
         const refreshToken = await authService.createRefreshToken(user.id);
 
@@ -295,6 +303,8 @@ export const authController = new Elysia({ prefix: "/auth" })
           name: user.name,
           email: user.email,
           role: user.role,
+          emailVerified: user.emailVerified,
+          emailVerifiedAt: user.emailVerifiedAt,
         });
         const refreshToken = await authService.createRefreshToken(user.id);
 
@@ -356,6 +366,8 @@ export const authController = new Elysia({ prefix: "/auth" })
           name: user.name,
           email: user.email,
           role: user.role,
+          emailVerified: user.emailVerified,
+          emailVerifiedAt: user.emailVerifiedAt,
         });
 
         // Automatically update cookies with the new rotated pair
@@ -423,6 +435,91 @@ export const authController = new Elysia({ prefix: "/auth" })
         summary: "Revoke refresh token, clear cookies, and terminate session",
         tags: ["Auth"],
         security: [{ cookieAuth: [] }],
+      },
+    }
+  )
+  .post(
+    "/verify-email",
+    async ({ body, set }) => {
+      try {
+        const verifiedUser = await authService.verifyEmail(body.token);
+        return {
+          success: true,
+          message: "Email verified successfully",
+          data: verifiedUser,
+        };
+      } catch (err: any) {
+        set.status = err.status || 500;
+        return {
+          success: false,
+          error: err.message || "Failed to verify email",
+        };
+      }
+    },
+    {
+      beforeHandle: authRateLimiter.beforeHandle,
+      body: VerifyEmailBodyModel,
+      response: VerifyEmailResponseModel,
+      detail: {
+        summary: "Verify user email using token from verification email",
+        tags: ["Auth"],
+      },
+    }
+  )
+  .get(
+    "/verify-email/:token",
+    async ({ params, set }) => {
+      try {
+        const verifiedUser = await authService.verifyEmail(params.token);
+        return {
+          success: true,
+          message: "Email verified successfully",
+          data: verifiedUser,
+        };
+      } catch (err: any) {
+        set.status = err.status || 500;
+        return {
+          success: false,
+          error: err.message || "Failed to verify email",
+        };
+      }
+    },
+    {
+      beforeHandle: authRateLimiter.beforeHandle,
+      params: t.Object({
+        token: t.String({ description: "Verification token" }),
+      }),
+      response: VerifyEmailResponseModel,
+      detail: {
+        summary: "Verify user email directly via URL parameter token",
+        tags: ["Auth"],
+      },
+    }
+  )
+  .post(
+    "/resend-verification",
+    async ({ body, set }) => {
+      try {
+        await authService.resendVerificationEmail(body.email);
+        return {
+          success: true,
+          message: "Verification email sent successfully. Please check your inbox.",
+        };
+      } catch (err: any) {
+        set.status = err.status || 500;
+        return {
+          success: false,
+          error: err.message || "Failed to resend verification email",
+        };
+      }
+    },
+    {
+      beforeHandle: authRateLimiter.beforeHandle,
+      body: ResendVerificationBodyModel,
+      response: ResendVerificationResponseModel,
+      detail: {
+        summary: "Resend email verification link to user's registered email",
+        tags: ["Auth"],
       },
     }
   )

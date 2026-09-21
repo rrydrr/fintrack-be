@@ -16,31 +16,35 @@ export const app = new Elysia()
       credentials: true,
     })
   )
-  .use(
-    swagger({
-      documentation: {
-        info: {
-          title: "FinTrack Receipt & Financial API",
-          version: "1.0.0",
-          description: "AI-powered receipt data extraction and financial tracking service using ElysiaJS and Bun",
-        },
-        tags: [
-          { name: "Auth", description: "User authentication & profile endpoints" },
-          { name: "Receipts", description: "Receipt extraction endpoints" },
-        ],
-        components: {
-          securitySchemes: {
-            cookieAuth: {
-              type: "apiKey",
-              in: "cookie",
-              name: "accessToken",
-              description: "Session access token automatically set in HttpOnly cookie upon login or registration",
+  .use((app) =>
+    config.isLocal
+      ? app.use(
+          swagger({
+            documentation: {
+              info: {
+                title: "FinTrack Receipt & Financial API",
+                version: "1.0.0",
+                description: "AI-powered receipt data extraction and financial tracking service using ElysiaJS and Bun",
+              },
+              tags: [
+                { name: "Auth", description: "User authentication & profile endpoints" },
+                { name: "Receipts", description: "Receipt extraction endpoints" },
+              ],
+              components: {
+                securitySchemes: {
+                  cookieAuth: {
+                    type: "apiKey",
+                    in: "cookie",
+                    name: "accessToken",
+                    description: "Session access token automatically set in HttpOnly cookie upon login or registration",
+                  },
+                },
+              },
             },
-          },
-        },
-      },
-      path: "/swagger",
-    })
+            path: "/swagger",
+          })
+        )
+      : app
   )
 
   // Global Error Handling
@@ -109,4 +113,6 @@ export const app = new Elysia()
   .listen(config.port);
 
 logger.success(`🚀 Server running at http://${app.server?.hostname}:${app.server?.port}`);
-logger.info(`📚 Swagger docs available at http://${app.server?.hostname}:${app.server?.port}/swagger`);
+if (config.isLocal) {
+  logger.info(`📚 Swagger docs available at http://${app.server?.hostname}:${app.server?.port}/swagger`);
+}

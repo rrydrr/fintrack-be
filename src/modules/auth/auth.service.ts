@@ -2,14 +2,43 @@ import { and, desc, eq, isNull } from "drizzle-orm";
 import { randomBytes, createHash } from "node:crypto";
 import { config } from "../../config/env";
 import { db } from "../../db";
-import { users, refreshTokens, inviteCodes, UserRole } from "../../db/schema";
+import {
+  users,
+  refreshTokens,
+  inviteCodes,
+  emailVerificationTokens,
+  UserRole,
+} from "../../db/schema";
 import { logger } from "../../utils/logger";
+import { sendVerificationEmail } from "../../utils/email";
 
 export interface SafeUser {
   id: string;
   name: string;
   email: string;
   role: UserRole;
+  emailVerified: boolean;
+  emailVerifiedAt: string | null;
+}
+
+/**
+ * Format internal user record into sanitized client-safe profile.
+ */
+function toSafeUser(user: {
+  id: string;
+  name: string;
+  email: string;
+  role: UserRole;
+  emailVerifiedAt?: Date | null;
+}): SafeUser {
+  return {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    emailVerified: Boolean(user.emailVerifiedAt),
+    emailVerifiedAt: user.emailVerifiedAt ? user.emailVerifiedAt.toISOString() : null,
+  };
 }
 
 /**
@@ -108,6 +137,7 @@ export class AuthService {
           name: users.name,
           email: users.email,
           role: users.role,
+          emailVerifiedAt: users.emailVerifiedAt,
         });
 
       await tx
@@ -128,7 +158,16 @@ export class AuthService {
       inviteCode: normalizedCode,
     });
 
-    return newUser;
+    // Asynchronously dispatch verification email without blocking registration
+    this.sendVerificationEmailForUser({
+      id: newUser.id,
+      email: newUser.email,
+      name: newUser.name,
+    }).catch((emailErr) => {
+      logger.error("Failed to send verification email upon registration", emailErr);
+    });
+
+    return toSafeUser(newUser);
   }
 
   /**
@@ -167,12 +206,7 @@ export class AuthService {
       role: user.role,
     });
 
-    return {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-    };
+    return toSafeUser(user);
   }
 
   /**
@@ -185,6 +219,7 @@ export class AuthService {
         name: users.name,
         email: users.email,
         role: users.role,
+        emailVerifiedAt: users.emailVerifiedAt,
       })
       .from(users)
       .where(eq(users.id, id))
@@ -196,7 +231,7 @@ export class AuthService {
       throw err;
     }
 
-    return user;
+    return toSafeUser(user);
   }
 
   /**
@@ -448,6 +483,176 @@ export class AuthService {
 
     await db.delete(inviteCodes).where(eq(inviteCodes.id, inviteId));
     logger.info("Admin revoked invite code", { inviteId });
+  }
+
+  /**
+   * Generate an email verification token and store its hash in DB.
+   */
+  public async createVerificationToken(
+    userId: string,
+    expiresInHours = 24
+  ): Promise<string> {
+    const rawToken = randomBytes(32).toString("hex");
+    const tokenHash = hashToken(rawToken);
+
+    // Invalidate any existing unused verification tokens for this user
+    await db
+      .update(emailVerificationTokens)
+      .set({ usedAt: new Date() })
+      .where(
+        and(
+          eq(emailVerificationTokens.userId, userId),
+          isNull(emailVerificationTokens.usedAt)
+        )
+      );
+
+    const expiresAt = new Date(
+      Date.now() + expiresInHours * 60 * 60 * 1000
+    );
+
+    await db.insert(emailVerificationTokens).values({
+      userId,
+      tokenHash,
+      expiresAt,
+    });
+
+    return rawToken;
+  }
+
+  /**
+   * Generate a token and send verification email for a user.
+   */
+  public async sendVerificationEmailForUser(user: {
+    id: string;
+    email: string;
+    name: string;
+  }): Promise<void> {
+    const token = await this.createVerificationToken(user.id);
+    const result = await sendVerificationEmail({
+      to: user.email,
+      name: user.name,
+      token,
+    });
+
+    if (!result.success) {
+      logger.warn(
+        `Failed to send verification email to ${user.email}: ${result.error}`
+      );
+    }
+  }
+
+  /**
+   * Verify an email address using a raw verification token.
+   */
+  public async verifyEmail(rawToken: string): Promise<SafeUser> {
+    const normalizedToken = (rawToken || "").trim();
+
+    if (!normalizedToken) {
+      const err: any = new Error("Verification token is required");
+      err.status = 400;
+      throw err;
+    }
+
+    const tokenHash = hashToken(normalizedToken);
+
+    const [record] = await db
+      .select()
+      .from(emailVerificationTokens)
+      .where(eq(emailVerificationTokens.tokenHash, tokenHash))
+      .limit(1);
+
+    if (!record) {
+      const err: any = new Error("Invalid verification token");
+      err.status = 400;
+      throw err;
+    }
+
+    if (record.usedAt) {
+      const err: any = new Error("This verification token has already been used");
+      err.status = 400;
+      throw err;
+    }
+
+    if (new Date() > record.expiresAt) {
+      const err: any = new Error("Verification token has expired");
+      err.status = 400;
+      throw err;
+    }
+
+    // Atomically mark token as used and set emailVerifiedAt on the user
+    const updatedUser = await db.transaction(async (tx) => {
+      await tx
+        .update(emailVerificationTokens)
+        .set({ usedAt: new Date() })
+        .where(eq(emailVerificationTokens.id, record.id));
+
+      const [user] = await tx
+        .update(users)
+        .set({ emailVerifiedAt: new Date() })
+        .where(eq(users.id, record.userId))
+        .returning({
+          id: users.id,
+          name: users.name,
+          email: users.email,
+          role: users.role,
+          emailVerifiedAt: users.emailVerifiedAt,
+        });
+
+      return user;
+    });
+
+    if (!updatedUser) {
+      const err: any = new Error("User account not found");
+      err.status = 404;
+      throw err;
+    }
+
+    logger.success("User email verified successfully", {
+      id: updatedUser.id,
+      email: updatedUser.email,
+    });
+
+    return toSafeUser(updatedUser);
+  }
+
+  /**
+   * Resend a verification email to a registered user.
+   */
+  public async resendVerificationEmail(email: string): Promise<void> {
+    const normalizedEmail = (email || "").toLowerCase().trim();
+
+    if (!normalizedEmail) {
+      const err: any = new Error("Email address is required");
+      err.status = 400;
+      throw err;
+    }
+
+    const [user] = await db
+      .select({
+        id: users.id,
+        name: users.name,
+        email: users.email,
+        role: users.role,
+        emailVerifiedAt: users.emailVerifiedAt,
+      })
+      .from(users)
+      .where(eq(users.email, normalizedEmail))
+      .limit(1);
+
+    if (!user) {
+      const err: any = new Error("No account found with this email address");
+      err.status = 404;
+      throw err;
+    }
+
+    if (user.emailVerifiedAt) {
+      const err: any = new Error("This email is already verified");
+      err.status = 400;
+      throw err;
+    }
+
+    await this.sendVerificationEmailForUser(user);
+    logger.info("Resent verification email", { email: user.email });
   }
 }
 
