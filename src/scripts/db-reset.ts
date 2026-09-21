@@ -12,7 +12,7 @@ async function askConfirmation(): Promise<boolean> {
   const rl = readline.createInterface({ input, output });
   try {
     const answer = await rl.question(
-      "\x1b[33m⚠️  CAUTION: This will DROP all tables in the database!\nAre you sure you want to proceed? (y/N): \x1b[0m"
+      "\x1b[33m⚠️  CAUTION: This will DROP all tables across auth, finance, and public schemas!\nAre you sure you want to proceed? (y/N): \x1b[0m"
     );
     const normalized = answer.trim().toLowerCase();
     return normalized === "y" || normalized === "yes";
@@ -33,18 +33,22 @@ async function resetDatabase() {
   logger.warn("⚠️  Starting database reset...");
 
   try {
-    // Drop all tables in the public schema cleanly with CASCADE
+    // Drop all tables across auth, finance, and public schemas cleanly with CASCADE
     await client.unsafe(`
       DO $$ DECLARE
         r RECORD;
       BEGIN
-        FOR r IN (SELECT tablename FROM pg_tables WHERE schemaname = 'public') LOOP
-          EXECUTE 'DROP TABLE IF EXISTS public.' || quote_ident(r.tablename) || ' CASCADE';
+        FOR r IN (
+          SELECT schemaname, tablename 
+          FROM pg_tables 
+          WHERE schemaname IN ('auth', 'finance', 'public')
+        ) LOOP
+          EXECUTE 'DROP TABLE IF EXISTS ' || quote_ident(r.schemaname) || '.' || quote_ident(r.tablename) || ' CASCADE';
         END LOOP;
       END $$;
     `);
 
-    logger.success("✅ Database reset complete: All tables dropped successfully.");
+    logger.success("✅ Database reset complete: All tables dropped across schemas.");
     logger.info("ℹ️  Run 'bun run db:push' to re-apply your Drizzle schema.");
   } catch (error: any) {
     logger.error("❌ Failed to reset database:", error.message || error);

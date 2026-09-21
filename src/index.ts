@@ -5,6 +5,9 @@ import { config } from "./config/env";
 import { logger } from "./utils/logger";
 import { receiptController } from "./modules/receipt/receipt.controller";
 import { authController } from "./modules/auth/auth.controller";
+import { currencyController } from "./modules/currency/currency.controller";
+import { accountTypeController } from "./modules/account-type/account-type.controller";
+import { accountController } from "./modules/account/account.controller";
 
 export const app = new Elysia()
   // Global Middlewares
@@ -28,6 +31,9 @@ export const app = new Elysia()
               },
               tags: [
                 { name: "Auth", description: "User authentication & profile endpoints" },
+                { name: "Currencies & Rates", description: "Currency catalog and exchange rates management" },
+                { name: "Account Types", description: "Account types and master templates management" },
+                { name: "Accounts", description: "Financial accounts and Net Worth calculation endpoints" },
                 { name: "Receipts", description: "Receipt extraction endpoints" },
               ],
               components: {
@@ -107,6 +113,9 @@ export const app = new Elysia()
 
   // Modules & Controllers
   .use(authController)
+  .use(currencyController)
+  .use(accountTypeController)
+  .use(accountController)
   .use(receiptController)
 
   // Start Server
@@ -116,3 +125,6 @@ logger.success(`🚀 Server running at http://${app.server?.hostname}:${app.serv
 if (config.isLocal) {
   logger.info(`📚 Swagger docs available at http://${app.server?.hostname}:${app.server?.port}/swagger`);
 }
+
+export type App = typeof app;
+

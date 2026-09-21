@@ -26,29 +26,51 @@ src/
 │   └── prompts.ts             # AI system instructions and JSON schemas
 ├── db/
 │   ├── schema/
-│   │   ├── email-verification-tokens.ts # Email verification tokens schema & types
-│   │   ├── index.ts           # Schema re-exports
-│   │   ├── invite-codes.ts    # Invite codes table schema & types
-│   │   ├── receipts.ts        # Receipts table schema & types
-│   │   ├── refresh-tokens.ts  # Refresh tokens table schema & types
-│   │   └── users.ts           # Users table schema & types
-│   └── index.ts               # Drizzle ORM & Postgres client connection
+│   │   ├── auth/
+│   │   │   ├── email-verification-tokens.ts # Email verification tokens schema & types
+│   │   │   ├── index.ts           # Auth schema group re-exports
+│   │   │   ├── invite-codes.ts    # Invite codes table schema & types
+│   │   │   ├── refresh-tokens.ts  # Refresh tokens table schema & types
+│   │   │   └── users.ts           # Users table schema & types
+│   │   ├── finance/
+│   │   │   ├── account-types.ts   # Account types & master seeder templates schema
+│   │   │   ├── accounts.ts        # Financial accounts table schema & types
+│   │   │   ├── currencies.ts      # Currencies catalog table schema & types
+│   │   │   ├── exchange-rates.ts  # Exchange rates table schema & types
+│   │   │   ├── index.ts           # Finance schema group re-exports
+│   │   │   └── receipts.ts        # Receipts table schema & types
+│   │   ├── index.ts               # Schema root re-exports
+│   │   └── schemas.ts             # PostgreSQL auth & finance schemas definition
+│   └── index.ts                   # Drizzle ORM & Postgres client connection
 ├── modules/
+│   ├── account/               # Financial accounts & Net Worth module
+│   │   ├── account.model.ts   # TypeBox schemas (CRUD, Net Worth summary)
+│   │   ├── account.service.ts # Account balance & Net Worth calculation logic
+│   │   └── account.controller.ts # Elysia account routes (/accounts)
+│   ├── account-type/          # Account types & templates domain module
+│   │   ├── account-type.model.ts # TypeBox schemas (CRUD, sync)
+│   │   ├── account-type.service.ts # Provisioning, template sync logic
+│   │   └── account-type.controller.ts # Elysia account type routes (/account-types)
 │   ├── auth/                  # Authentication & authorization module
 │   │   ├── auth.model.ts      # TypeBox schemas (Register, Login, User)
 │   │   ├── auth.service.ts    # Auth business logic (hashing, verification)
 │   │   └── auth.controller.ts # Elysia auth routes & authPlugin guard (/auth)
+│   ├── currency/              # Universal currencies & exchange rates module
+│   │   ├── currency.model.ts  # TypeBox schemas (Currencies, Rates)
+│   │   ├── currency.service.ts# Conversion logic & currency CRUD
+│   │   └── currency.controller.ts # Elysia currency routes (/currencies)
 │   └── receipt/               # Receipt extraction domain module
 │       ├── receipt.model.ts   # TypeBox schemas (Request, Response, Entities)
 │       ├── receipt.service.ts # Business logic & upstream integrations
 │       └── receipt.controller.ts # Elysia route plugin with prefix (/receipts)
 ├── scripts/
-│   ├── db-reset.ts            # Database reset utility (drops all tables)
-│   └── db-seed.ts             # Database seeding utility (placeholder)
+│   ├── db-reset.ts            # Database reset utility (drops across schemas)
+│   └── db-seed.ts             # Database seeding utility (currencies, templates, demo accounts)
 ├── utils/
 │   ├── email.ts               # Transactional email utility (Brevo REST API)
 │   ├── image.ts               # Image & media utilities (Data URL conversion)
 │   ├── logger.ts              # Custom pretty rotating file logger
+│   ├── pagination.ts          # Reusable optional pagination models & helper
 │   └── rate-limiter.ts        # Native sliding-window rate limiter utility
 └── index.ts                   # App composition root (plugins, hooks, global errors)
 ```

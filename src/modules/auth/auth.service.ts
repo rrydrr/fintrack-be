@@ -12,11 +12,14 @@ import {
 import { logger } from "../../utils/logger";
 import { sendVerificationEmail } from "../../utils/email";
 
+import { accountTypeService } from "../account-type/account-type.service";
+
 export interface SafeUser {
   id: string;
   name: string;
   email: string;
   role: UserRole;
+  defaultCurrency: string;
   emailVerified: boolean;
   emailVerifiedAt: string | null;
 }
@@ -29,6 +32,7 @@ function toSafeUser(user: {
   name: string;
   email: string;
   role: UserRole;
+  defaultCurrency?: string | null;
   emailVerifiedAt?: Date | null;
 }): SafeUser {
   return {
@@ -36,6 +40,7 @@ function toSafeUser(user: {
     name: user.name,
     email: user.email,
     role: user.role,
+    defaultCurrency: user.defaultCurrency || "IDR",
     emailVerified: Boolean(user.emailVerifiedAt),
     emailVerifiedAt: user.emailVerifiedAt ? user.emailVerifiedAt.toISOString() : null,
   };
@@ -137,6 +142,7 @@ export class AuthService {
           name: users.name,
           email: users.email,
           role: users.role,
+          defaultCurrency: users.defaultCurrency,
           emailVerifiedAt: users.emailVerifiedAt,
         });
 
@@ -150,6 +156,13 @@ export class AuthService {
 
       return createdUser;
     });
+
+    // 5. Automatically provision initial account types for the new user from master templates
+    try {
+      await accountTypeService.seedUserAccountTypes(newUser.id);
+    } catch (seedErr) {
+      logger.error("Failed to seed user account types upon registration", seedErr);
+    }
 
     logger.success("User registered with invite code successfully", {
       id: newUser.id,
@@ -219,6 +232,7 @@ export class AuthService {
         name: users.name,
         email: users.email,
         role: users.role,
+        defaultCurrency: users.defaultCurrency,
         emailVerifiedAt: users.emailVerifiedAt,
       })
       .from(users)
@@ -653,6 +667,35 @@ export class AuthService {
 
     await this.sendVerificationEmailForUser(user);
     logger.info("Resent verification email", { email: user.email });
+  }
+
+  /**
+   * Update the user's preferred default base currency.
+   */
+  public async updateDefaultCurrency(userId: string, currencyCode: string): Promise<SafeUser> {
+    const normalized = currencyCode.trim().toUpperCase();
+
+    const [updated] = await db
+      .update(users)
+      .set({ defaultCurrency: normalized })
+      .where(eq(users.id, userId))
+      .returning({
+        id: users.id,
+        name: users.name,
+        email: users.email,
+        role: users.role,
+        defaultCurrency: users.defaultCurrency,
+        emailVerifiedAt: users.emailVerifiedAt,
+      });
+
+    if (!updated) {
+      const err: any = new Error("User not found");
+      err.status = 404;
+      throw err;
+    }
+
+    logger.info(`Updated default currency to ${normalized} for user`, { userId });
+    return toSafeUser(updated);
   }
 }
 

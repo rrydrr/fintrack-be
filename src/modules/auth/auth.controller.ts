@@ -18,6 +18,8 @@ import {
   VerifyEmailResponseModel,
   ResendVerificationBodyModel,
   ResendVerificationResponseModel,
+  UpdateCurrencyBodyModel,
+  UpdateCurrencyResponseModel,
 } from "./auth.model";
 
 
@@ -158,6 +160,7 @@ export async function verifyAuth(
     name: (payload.name as string) || "",
     email: (payload.email as string) || "",
     role: (payload.role as UserRole) || "user",
+    defaultCurrency: (payload.defaultCurrency as string) || "IDR",
     emailVerified: Boolean(payload.emailVerified),
     emailVerifiedAt: (payload.emailVerifiedAt as string) || null,
   };
@@ -254,6 +257,7 @@ export const authController = new Elysia({ prefix: "/auth" })
           name: user.name,
           email: user.email,
           role: user.role,
+          defaultCurrency: user.defaultCurrency,
           emailVerified: user.emailVerified,
           emailVerifiedAt: user.emailVerifiedAt,
         });
@@ -303,6 +307,7 @@ export const authController = new Elysia({ prefix: "/auth" })
           name: user.name,
           email: user.email,
           role: user.role,
+          defaultCurrency: user.defaultCurrency,
           emailVerified: user.emailVerified,
           emailVerifiedAt: user.emailVerifiedAt,
         });
@@ -366,6 +371,7 @@ export const authController = new Elysia({ prefix: "/auth" })
           name: user.name,
           email: user.email,
           role: user.role,
+          defaultCurrency: user.defaultCurrency,
           emailVerified: user.emailVerified,
           emailVerifiedAt: user.emailVerifiedAt,
         });
@@ -546,6 +552,35 @@ export const authController = new Elysia({ prefix: "/auth" })
       response: MeResponseModel,
       detail: {
         summary: "Get current authenticated user profile (via session cookie)",
+        tags: ["Auth"],
+        security: [{ cookieAuth: [] }],
+      },
+    }
+  )
+  .patch(
+    "/me/currency",
+    async ({ headers, cookie, jwt, body, set }) => {
+      try {
+        const tokenUser = await verifyAuth(headers, jwt, cookie);
+        const updated = await authService.updateDefaultCurrency(tokenUser.id, body.currency);
+        return {
+          success: true,
+          message: `Default currency updated to ${updated.defaultCurrency}`,
+          data: updated,
+        };
+      } catch (err: any) {
+        set.status = err.status || 500;
+        return {
+          success: false,
+          error: err.message || "Failed to update default currency",
+        };
+      }
+    },
+    {
+      body: UpdateCurrencyBodyModel,
+      response: UpdateCurrencyResponseModel,
+      detail: {
+        summary: "Update current authenticated user's preferred default base currency",
         tags: ["Auth"],
         security: [{ cookieAuth: [] }],
       },
