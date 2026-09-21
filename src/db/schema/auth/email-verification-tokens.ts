@@ -1,7 +1,8 @@
-import { pgTable, uuid, text, timestamp, index } from "drizzle-orm/pg-core";
+import { uuid, text, timestamp, index } from "drizzle-orm/pg-core";
+import { authSchema } from "../schemas";
 import { users } from "./users";
 
-export const emailVerificationTokens = pgTable(
+export const emailVerificationTokens = authSchema.table(
   "email_verification_tokens",
   {
     id: uuid("id").defaultRandom().primaryKey(),

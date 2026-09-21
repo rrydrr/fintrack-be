@@ -1,7 +1,8 @@
-import { pgTable, uuid, text, timestamp, index } from "drizzle-orm/pg-core";
+import { uuid, text, timestamp, index } from "drizzle-orm/pg-core";
+import { authSchema } from "../schemas";
 import { users } from "./users";
 
-export const refreshTokens = pgTable(
+export const refreshTokens = authSchema.table(
   "refresh_tokens",
   {
     id: uuid("id").defaultRandom().primaryKey(),
@@ -23,4 +24,3 @@ export const refreshTokens = pgTable(
 
 export type RefreshToken = typeof refreshTokens.$inferSelect;
 export type NewRefreshToken = typeof refreshTokens.$inferInsert;
-

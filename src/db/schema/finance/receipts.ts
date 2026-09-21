@@ -1,7 +1,8 @@
-import { pgTable, uuid, text, numeric, jsonb, timestamp } from "drizzle-orm/pg-core";
-import { users } from "./users";
+import { uuid, text, numeric, jsonb, timestamp } from "drizzle-orm/pg-core";
+import { financeSchema } from "../schemas";
+import { users } from "../auth/users";
 
-export const receipts = pgTable("receipts", {
+export const receipts = financeSchema.table("receipts", {
   id: uuid("id").defaultRandom().primaryKey(),
   userId: uuid("user_id")
     .references(() => users.id, { onDelete: "cascade" })

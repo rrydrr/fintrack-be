@@ -1,7 +1,8 @@
-import { pgTable, uuid, text, timestamp, index } from "drizzle-orm/pg-core";
+import { uuid, text, timestamp, index } from "drizzle-orm/pg-core";
+import { authSchema } from "../schemas";
 import { users } from "./users";
 
-export const inviteCodes = pgTable(
+export const inviteCodes = authSchema.table(
   "invite_codes",
   {
     id: uuid("id").defaultRandom().primaryKey(),
