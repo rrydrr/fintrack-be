@@ -29,7 +29,7 @@ export const receiptController = new Elysia({ prefix: "/receipts" })
       parse: "formdata",
       body: ExtractReceiptBodyModel,
       detail: {
-        summary: "Upload receipt image file to extract structured data",
+        summary: "Extract receipt",
         tags: ["Receipts"],
         security: [{ cookieAuth: [] }],
       },
@@ -57,14 +57,14 @@ export const receiptController = new Elysia({ prefix: "/receipts" })
     {
       query: t.Object({
         page: t.Optional(
-          t.Numeric({ default: 1, description: "Page number (min: 1)" })
+          t.Numeric({ default: 1, description: "Page number" })
         ),
         limit: t.Optional(
-          t.Numeric({ default: 10, description: "Items per page (max: 100)" })
+          t.Numeric({ default: 10, description: "Items per page" })
         ),
       }),
       detail: {
-        summary: "List receipts with pagination",
+        summary: "List receipts",
         tags: ["Receipts"],
         security: [{ cookieAuth: [] }],
       },
@@ -94,10 +94,10 @@ export const receiptController = new Elysia({ prefix: "/receipts" })
     },
     {
       params: t.Object({
-        id: t.String({ description: "Receipt unique ID (UUID)" }),
+        id: t.String({ description: "Receipt ID" }),
       }),
       detail: {
-        summary: "Get a single receipt by unique ID",
+        summary: "Get receipt",
         tags: ["Receipts"],
         security: [{ cookieAuth: [] }],
       },

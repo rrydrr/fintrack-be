@@ -28,12 +28,12 @@ export const accountController = new Elysia({ name: "accounts", prefix: "/accoun
     {
       query: t.Object({
         currency: t.Optional(
-          t.String({ description: "Target currency for Net Worth aggregation (defaults to user default currency)" })
+          t.String({ description: "Target currency" })
         ),
       }),
       response: NetWorthSummaryResponseModel,
       detail: {
-        summary: "Calculate aggregated Net Worth and balance summary across all user accounts in target currency",
+        summary: "Get net worth summary",
         tags: ["Accounts"],
         security: [{ cookieAuth: [] }],
       },
@@ -61,7 +61,7 @@ export const accountController = new Elysia({ name: "accounts", prefix: "/accoun
       query: ListAccountsQueryModel,
       response: ListAccountsResponseModel,
       detail: {
-        summary: "List all financial accounts owned by the user (optional pagination)",
+        summary: "List accounts",
         tags: ["Accounts"],
         security: [{ cookieAuth: [] }],
       },
@@ -89,7 +89,7 @@ export const accountController = new Elysia({ name: "accounts", prefix: "/accoun
       body: CreateAccountBodyModel,
       response: AccountDetailResponseModel,
       detail: {
-        summary: "Create a new financial account (defaults to user preferred currency if omitted)",
+        summary: "Create account",
         tags: ["Accounts"],
         security: [{ cookieAuth: [] }],
       },
@@ -113,10 +113,10 @@ export const accountController = new Elysia({ name: "accounts", prefix: "/accoun
       }
     },
     {
-      params: t.Object({ id: t.String({ description: "Account unique ID" }) }),
+      params: t.Object({ id: t.String({ description: "Account ID" }) }),
       response: AccountDetailResponseModel,
       detail: {
-        summary: "Get single financial account details by ID",
+        summary: "Get account",
         tags: ["Accounts"],
         security: [{ cookieAuth: [] }],
       },
@@ -140,11 +140,11 @@ export const accountController = new Elysia({ name: "accounts", prefix: "/accoun
       }
     },
     {
-      params: t.Object({ id: t.String({ description: "Account unique ID" }) }),
+      params: t.Object({ id: t.String({ description: "Account ID" }) }),
       body: UpdateAccountBodyModel,
       response: AccountDetailResponseModel,
       detail: {
-        summary: "Update financial account details",
+        summary: "Update account",
         tags: ["Accounts"],
         security: [{ cookieAuth: [] }],
       },
@@ -165,10 +165,10 @@ export const accountController = new Elysia({ name: "accounts", prefix: "/accoun
       }
     },
     {
-      params: t.Object({ id: t.String({ description: "Account unique ID" }) }),
+      params: t.Object({ id: t.String({ description: "Account ID" }) }),
       response: AccountActionResponseModel,
       detail: {
-        summary: "Delete financial account",
+        summary: "Delete account",
         tags: ["Accounts"],
         security: [{ cookieAuth: [] }],
       },

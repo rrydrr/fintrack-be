@@ -292,7 +292,7 @@ export const authController = new Elysia({ prefix: "/auth" })
       body: RegisterBodyModel,
       response: RegisterResponseModel,
       detail: {
-        summary: "Register a new user account (sets auth cookies, returns user profile)",
+        summary: "Register",
         tags: ["Auth"],
       },
     }
@@ -341,7 +341,7 @@ export const authController = new Elysia({ prefix: "/auth" })
       body: LoginBodyModel,
       response: AuthResponseModel,
       detail: {
-        summary: "Log in with email and password (sets auth cookies, returns user profile)",
+        summary: "Login",
         tags: ["Auth"],
       },
     }
@@ -402,7 +402,7 @@ export const authController = new Elysia({ prefix: "/auth" })
     {
       response: RefreshTokenResponseModel,
       detail: {
-        summary: "Rotate refresh token and update HTTP-only cookies",
+        summary: "Refresh token",
         tags: ["Auth"],
         security: [{ cookieAuth: [] }],
       },
@@ -438,7 +438,7 @@ export const authController = new Elysia({ prefix: "/auth" })
     {
       response: LogoutResponseModel,
       detail: {
-        summary: "Revoke refresh token, clear cookies, and terminate session",
+        summary: "Logout",
         tags: ["Auth"],
         security: [{ cookieAuth: [] }],
       },
@@ -467,7 +467,7 @@ export const authController = new Elysia({ prefix: "/auth" })
       body: VerifyEmailBodyModel,
       response: VerifyEmailResponseModel,
       detail: {
-        summary: "Verify user email using token from verification email",
+        summary: "Verify email",
         tags: ["Auth"],
       },
     }
@@ -497,7 +497,7 @@ export const authController = new Elysia({ prefix: "/auth" })
       }),
       response: VerifyEmailResponseModel,
       detail: {
-        summary: "Verify user email directly via URL parameter token",
+        summary: "Verify email via link",
         tags: ["Auth"],
       },
     }
@@ -524,7 +524,7 @@ export const authController = new Elysia({ prefix: "/auth" })
       body: ResendVerificationBodyModel,
       response: ResendVerificationResponseModel,
       detail: {
-        summary: "Resend email verification link to user's registered email",
+        summary: "Resend verification email",
         tags: ["Auth"],
       },
     }
@@ -551,7 +551,7 @@ export const authController = new Elysia({ prefix: "/auth" })
     {
       response: MeResponseModel,
       detail: {
-        summary: "Get current authenticated user profile (via session cookie)",
+        summary: "Get current user",
         tags: ["Auth"],
         security: [{ cookieAuth: [] }],
       },
@@ -580,7 +580,7 @@ export const authController = new Elysia({ prefix: "/auth" })
       body: UpdateCurrencyBodyModel,
       response: UpdateCurrencyResponseModel,
       detail: {
-        summary: "Update current authenticated user's preferred default base currency",
+        summary: "Update default currency",
         tags: ["Auth"],
         security: [{ cookieAuth: [] }],
       },
@@ -608,7 +608,7 @@ export const inviteController = new Elysia({ prefix: "/invites" })
       body: CreateInviteBodyModel,
       response: CreateInviteResponseModel,
       detail: {
-        summary: "Generate a one-time registration invite code expiring in 7 days (Admin only)",
+        summary: "Create invite code",
         tags: ["Auth"],
         security: [{ cookieAuth: [] }],
       },
@@ -627,7 +627,7 @@ export const inviteController = new Elysia({ prefix: "/invites" })
       roles: ["admin"],
       response: ListInvitesResponseModel,
       detail: {
-        summary: "List all registration invite codes and their redemption status (Admin only)",
+        summary: "List invite codes",
         tags: ["Auth"],
         security: [{ cookieAuth: [] }],
       },
@@ -649,7 +649,7 @@ export const inviteController = new Elysia({ prefix: "/invites" })
       }),
       response: RevokeInviteResponseModel,
       detail: {
-        summary: "Revoke an unused invite code (Admin only)",
+        summary: "Revoke invite code",
         tags: ["Auth"],
         security: [{ cookieAuth: [] }],
       },

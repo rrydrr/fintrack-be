@@ -37,7 +37,7 @@ export const currencyController = new Elysia({ name: "currencies", prefix: "/cur
       query: ListRatesQueryModel,
       response: ListRatesResponseModel,
       detail: {
-        summary: "List exchange rates (universal system rates + user custom rates, optional pagination)",
+        summary: "List exchange rates",
         tags: ["Currencies & Rates"],
         security: [{ cookieAuth: [] }],
       },
@@ -53,10 +53,10 @@ export const currencyController = new Elysia({ name: "currencies", prefix: "/cur
       };
     },
     {
-      params: t.Object({ id: t.String({ description: "Exchange rate unique ID" }) }),
+      params: t.Object({ id: t.String({ description: "Exchange rate ID" }) }),
       response: ExchangeRateDetailResponseModel,
       detail: {
-        summary: "Get single exchange rate by ID",
+        summary: "Get exchange rate",
         tags: ["Currencies & Rates"],
         security: [{ cookieAuth: [] }],
       },
@@ -90,7 +90,7 @@ export const currencyController = new Elysia({ name: "currencies", prefix: "/cur
       body: CreateExchangeRateBodyModel,
       response: ExchangeRateDetailResponseModel,
       detail: {
-        summary: "Create exchange rate (Admin creates universal rates; users create custom rates based on JWT)",
+        summary: "Create exchange rate",
         tags: ["Currencies & Rates"],
         security: [{ cookieAuth: [] }],
       },
@@ -111,10 +111,10 @@ export const currencyController = new Elysia({ name: "currencies", prefix: "/cur
       }
     },
     {
-      params: t.Object({ id: t.String({ description: "Exchange rate unique ID" }) }),
+      params: t.Object({ id: t.String({ description: "Exchange rate ID" }) }),
       response: ActionSuccessResponseModel,
       detail: {
-        summary: "Delete exchange rate (Permissions evaluated via JWT)",
+        summary: "Delete exchange rate",
         tags: ["Currencies & Rates"],
         security: [{ cookieAuth: [] }],
       },
@@ -142,7 +142,7 @@ export const currencyController = new Elysia({ name: "currencies", prefix: "/cur
       query: ListCurrenciesQueryModel,
       response: ListCurrenciesResponseModel,
       detail: {
-        summary: "List all active currencies (universal fiats + user custom currencies, optional pagination)",
+        summary: "List currencies",
         tags: ["Currencies & Rates"],
         security: [{ cookieAuth: [] }],
       },
@@ -170,7 +170,7 @@ export const currencyController = new Elysia({ name: "currencies", prefix: "/cur
       body: CreateCurrencyBodyModel,
       response: CurrencyDetailResponseModel,
       detail: {
-        summary: "Create currency (Admin creates universal system fiats; users create personal custom currencies/crypto)",
+        summary: "Create currency",
         tags: ["Currencies & Rates"],
         security: [{ cookieAuth: [] }],
       },
@@ -194,10 +194,10 @@ export const currencyController = new Elysia({ name: "currencies", prefix: "/cur
       }
     },
     {
-      params: t.Object({ id: t.String({ description: "Currency unique ID" }) }),
+      params: t.Object({ id: t.String({ description: "Currency ID" }) }),
       response: CurrencyDetailResponseModel,
       detail: {
-        summary: "Get currency metadata by ID",
+        summary: "Get currency",
         tags: ["Currencies & Rates"],
         security: [{ cookieAuth: [] }],
       },
@@ -221,11 +221,11 @@ export const currencyController = new Elysia({ name: "currencies", prefix: "/cur
       }
     },
     {
-      params: t.Object({ id: t.String({ description: "Currency unique ID" }) }),
+      params: t.Object({ id: t.String({ description: "Currency ID" }) }),
       body: UpdateCurrencyBodyModel,
       response: CurrencyDetailResponseModel,
       detail: {
-        summary: "Update currency metadata (Permissions evaluated via JWT)",
+        summary: "Update currency",
         tags: ["Currencies & Rates"],
         security: [{ cookieAuth: [] }],
       },
@@ -246,10 +246,10 @@ export const currencyController = new Elysia({ name: "currencies", prefix: "/cur
       }
     },
     {
-      params: t.Object({ id: t.String({ description: "Currency unique ID" }) }),
+      params: t.Object({ id: t.String({ description: "Currency ID" }) }),
       response: ActionSuccessResponseModel,
       detail: {
-        summary: "Delete currency (Permissions evaluated via JWT)",
+        summary: "Delete currency",
         tags: ["Currencies & Rates"],
         security: [{ cookieAuth: [] }],
       },

@@ -31,7 +31,7 @@ export const accountTypeController = new Elysia({
     {
       response: SyncTemplatesResponseModel,
       detail: {
-        summary: "Sync missing admin master templates into the authenticated user's account types",
+        summary: "Sync templates",
         tags: ["Account Types"],
         security: [{ cookieAuth: [] }],
       },
@@ -58,7 +58,7 @@ export const accountTypeController = new Elysia({
       query: ListAccountTypesQueryModel,
       response: ListAccountTypesResponseModel,
       detail: {
-        summary: "List account types (or master templates if isTemplate=true and Admin, optional pagination)",
+        summary: "List account types",
         tags: ["Account Types"],
         security: [{ cookieAuth: [] }],
       },
@@ -95,7 +95,7 @@ export const accountTypeController = new Elysia({
       body: CreateAccountTypeBodyModel,
       response: AccountTypeDetailResponseModel,
       detail: {
-        summary: "Create account type (Admin creates master template if isTemplate=true; user creates personal custom type)",
+        summary: "Create account type",
         tags: ["Account Types"],
         security: [{ cookieAuth: [] }],
       },
@@ -119,10 +119,10 @@ export const accountTypeController = new Elysia({
       }
     },
     {
-      params: t.Object({ id: t.String({ description: "Account type unique ID" }) }),
+      params: t.Object({ id: t.String({ description: "Account type ID" }) }),
       response: AccountTypeDetailResponseModel,
       detail: {
-        summary: "Get account type details by ID",
+        summary: "Get account type",
         tags: ["Account Types"],
         security: [{ cookieAuth: [] }],
       },
@@ -146,11 +146,11 @@ export const accountTypeController = new Elysia({
       }
     },
     {
-      params: t.Object({ id: t.String({ description: "Account type unique ID" }) }),
+      params: t.Object({ id: t.String({ description: "Account type ID" }) }),
       body: UpdateAccountTypeBodyModel,
       response: AccountTypeDetailResponseModel,
       detail: {
-        summary: "Update account type or master template (Permissions evaluated via JWT)",
+        summary: "Update account type",
         tags: ["Account Types"],
         security: [{ cookieAuth: [] }],
       },
@@ -171,10 +171,10 @@ export const accountTypeController = new Elysia({
       }
     },
     {
-      params: t.Object({ id: t.String({ description: "Account type unique ID" }) }),
+      params: t.Object({ id: t.String({ description: "Account type ID" }) }),
       response: AccountTypeActionResponseModel,
       detail: {
-        summary: "Delete account type or master template (Permissions evaluated via JWT)",
+        summary: "Delete account type",
         tags: ["Account Types"],
         security: [{ cookieAuth: [] }],
       },

@@ -4,54 +4,54 @@ export const RegisterBodyModel = t.Object({
   name: t.String({
     minLength: 2,
     maxLength: 100,
-    description: "Full name of the user",
+    description: "Full name",
   }),
   email: t.String({
     format: "email",
-    description: "Valid email address",
+    description: "Email address",
   }),
   password: t.String({
     minLength: 6,
     maxLength: 128,
-    description: "Password (min 6 characters)",
+    description: "Password",
   }),
   inviteCode: t.String({
     minLength: 4,
     maxLength: 32,
-    description: "One-time registration invite code issued by an administrator",
+    description: "Invite code",
   }),
 });
 
 export const LoginBodyModel = t.Object({
   email: t.String({
     format: "email",
-    description: "User registered email",
+    description: "Email address",
   }),
   password: t.String({
     minLength: 1,
-    description: "User password",
+    description: "Password",
   }),
 });
 
 export const UserRoleModel = t.Union([t.Literal("admin"), t.Literal("user")], {
-  description: "User role ('admin' or 'user')",
+  description: "User role",
 });
 
 export const UserModel = t.Object({
-  id: t.String({ description: "User unique ID" }),
-  name: t.String({ description: "User full name" }),
-  email: t.String({ description: "User email address" }),
+  id: t.String({ description: "User ID" }),
+  name: t.String({ description: "Full name" }),
+  email: t.String({ description: "Email address" }),
   role: UserRoleModel,
-  defaultCurrency: t.String({ description: "User's preferred base currency code (default: 'IDR')" }),
-  emailVerified: t.Boolean({ description: "Whether the user's email is verified" }),
-  emailVerifiedAt: t.Nullable(t.String({ description: "Timestamp when email was verified (ISO string)" })),
+  defaultCurrency: t.String({ description: "Base currency code" }),
+  emailVerified: t.Boolean({ description: "Email verified status" }),
+  emailVerifiedAt: t.Nullable(t.String({ description: "Email verified timestamp" })),
 });
 
 export const UpdateCurrencyBodyModel = t.Object({
   currency: t.String({
     minLength: 2,
     maxLength: 10,
-    description: "New default currency code (e.g. 'IDR', 'USD', 'EUR')",
+    description: "Currency code",
   }),
 });
 
@@ -63,13 +63,13 @@ export const UpdateCurrencyResponseModel = t.Object({
 });
 
 export const InviteCodeModel = t.Object({
-  id: t.String({ description: "Unique invite ID" }),
-  code: t.String({ description: "One-time signup code" }),
-  createdBy: t.String({ description: "Admin user ID who created the invite" }),
-  usedBy: t.Nullable(t.String({ description: "User ID who used the invite" })),
-  expiresAt: t.String({ description: "Expiration timestamp (ISO string)" }),
-  usedAt: t.Nullable(t.String({ description: "Usage timestamp (ISO string)" })),
-  createdAt: t.String({ description: "Creation timestamp (ISO string)" }),
+  id: t.String({ description: "Invite ID" }),
+  code: t.String({ description: "Invite code" }),
+  createdBy: t.String({ description: "Creator user ID" }),
+  usedBy: t.Nullable(t.String({ description: "Redeemer user ID" })),
+  expiresAt: t.String({ description: "Expiration timestamp" }),
+  usedAt: t.Nullable(t.String({ description: "Usage timestamp" })),
+  createdAt: t.String({ description: "Creation timestamp" }),
 });
 
 export const CreateInviteBodyModel = t.Optional(
@@ -79,7 +79,7 @@ export const CreateInviteBodyModel = t.Optional(
         default: 7,
         minimum: 1,
         maximum: 30,
-        description: "Number of days until the code expires (default: 7)",
+        description: "Expires in days",
       })
     ),
   })
@@ -132,7 +132,7 @@ export const MeResponseModel = t.Object({
 export const VerifyEmailBodyModel = t.Object({
   token: t.String({
     minLength: 1,
-    description: "Verification token received in the verification email",
+    description: "Verification token",
   }),
 });
 
@@ -146,7 +146,7 @@ export const VerifyEmailResponseModel = t.Object({
 export const ResendVerificationBodyModel = t.Object({
   email: t.String({
     format: "email",
-    description: "Registered email address to resend verification email to",
+    description: "Email address",
   }),
 });
 
