@@ -52,9 +52,20 @@ src/
 │   │   ├── account-type.service.ts # Provisioning, template sync logic
 │   │   └── account-type.controller.ts # Elysia account type routes (/account-types)
 │   ├── auth/                  # Authentication & authorization module
+│   │   ├── controllers/
+│   │   │   ├── email.controller.ts       # Email verification endpoints (/verify-email, resend)
+│   │   │   ├── invite.controller.ts      # Admin invite code endpoints (/invites)
+│   │   │   ├── session.controller.ts     # Auth session endpoints (/register, /login, /refresh, /logout)
+│   │   │   └── user.controller.ts        # User profile endpoints (/me, /me/currency)
+│   │   ├── services/
+│   │   │   ├── email-verification.service.ts # Verification token generation & email dispatch
+│   │   │   ├── invite.service.ts         # Invite code creation, listing, & revocation
+│   │   │   ├── token.service.ts          # Refresh token rotation, reuse detection, & revocation
+│   │   │   └── user.service.ts           # User retrieval & currency preference updates
+│   │   ├── auth.controller.ts # Root Elysia auth router composition & guard re-exports (/auth)
+│   │   ├── auth.guard.ts      # Rate limiters, JWT plugins, cookie helpers, & authPlugin guards
 │   │   ├── auth.model.ts      # TypeBox schemas (Register, Login, User)
-│   │   ├── auth.service.ts    # Auth business logic (hashing, verification)
-│   │   └── auth.controller.ts # Elysia auth routes & authPlugin guard (/auth)
+│   │   └── auth.service.ts    # Auth orchestrator & subservice delegations
 │   ├── currency/              # Universal currencies & exchange rates module
 │   │   ├── currency.model.ts  # TypeBox schemas (Currencies, Rates)
 │   │   ├── currency.service.ts# Conversion logic & currency CRUD
@@ -89,6 +100,14 @@ src/
    - Each controller exports an `Elysia` instance with a route prefix (e.g., `new Elysia({ prefix: "/receipts" })`).
    - Register new controllers in `src/index.ts` using `.use(featureController)`.
    - Detailed runbook available in [`.agents/skills/create-elysia-route/SKILL.md`](./.agents/skills/create-elysia-route/SKILL.md).
+4. **Controller & Service Decomposition (Modularity Rule):**
+   - Controllers and services must remain focused, readable, and maintainable.
+   - **Threshold:** When any controller or service file exceeds ~250–300 lines of code, or accumulates multiple distinct sub-domains/concerns (e.g., auth sessions, invite codes, email verification, user profile):
+     - **Subcontrollers:** Split endpoints into subcontrollers in `src/modules/<feature>/controllers/<subdomain>.controller.ts`. Compose them in the root `<feature>.controller.ts`.
+     - **Subservices:** Split business logic into subservices in `src/modules/<feature>/services/<subdomain>.service.ts`. The root `<feature>.service.ts` acts as an orchestrator and delegates to subservices.
+     - **Guards & Middlewares:** Extract route guards, macros, rate limiters, and cookie helpers into `<feature>.guard.ts`.
+     - **Backward Compatibility:** Root controllers and services must re-export all subcontrollers, subservices, and types so external callers and Eden Treaty client typings are preserved.
+     - **Explicit Type Exports in ESM:** Always use `export type { MyInterface }` when re-exporting TypeScript interfaces/types to prevent Bun/ESM runtime `SyntaxError: export '...' not found`.
 
 ---
 

@@ -22,6 +22,14 @@ src/modules/<feature-name>/
 └── <feature-name>.controller.ts  # Elysia router plugin with route prefix
 ```
 
+> [!IMPORTANT]
+> **Subcontroller & Subservice Decomposition Rule:**
+> If a controller or service exceeds ~250–300 lines or addresses multiple distinct sub-domains, it must be decomposed into subdirectories:
+> - `src/modules/<feature>/controllers/<subdomain>.controller.ts`
+> - `src/modules/<feature>/services/<subdomain>.service.ts`
+> - `src/modules/<feature>/<feature>.guard.ts` (for guards, middlewares, and rate limiters)
+> Root `<feature>.controller.ts` and `<feature>.service.ts` remain the entry points and re-export sub-components and types (using `export type` for interfaces) to preserve full backward compatibility and Eden Treaty client typings.
+
 ---
 
 ## 2. Step-by-Step Implementation
