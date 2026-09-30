@@ -12,6 +12,7 @@ import {
 } from "../db/schema";
 import { accountTypeService } from "../modules/account-type/account-type.service";
 import { logger } from "../utils/logger";
+import { config } from "../config/env";
 import { and, eq, isNull } from "drizzle-orm";
 
 interface SeedUser {
@@ -25,8 +26,8 @@ interface SeedUser {
 const SEED_USERS: SeedUser[] = [
   {
     name: "Admin FinTrack",
-    email: "admin@fintrack.local",
-    password: "ChangeMe123!",
+    email: config.seedAdminEmail,
+    password: config.seedAdminPassword,
     role: "admin",
     defaultCurrency: "IDR",
   },
