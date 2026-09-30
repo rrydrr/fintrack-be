@@ -535,22 +535,49 @@ export class AuthService {
 
   /**
    * Generate a token and send verification email for a user.
+   * Ensures the user exists in the database and is unverified before sending.
    */
   public async sendVerificationEmailForUser(user: {
     id: string;
-    email: string;
-    name: string;
+    email?: string;
+    name?: string;
   }): Promise<void> {
-    const token = await this.createVerificationToken(user.id);
+    const [existingUser] = await db
+      .select({
+        id: users.id,
+        email: users.email,
+        name: users.name,
+        emailVerifiedAt: users.emailVerifiedAt,
+      })
+      .from(users)
+      .where(eq(users.id, user.id))
+      .limit(1);
+
+    if (!existingUser) {
+      logger.warn("Cannot send verification email: User not found in database", {
+        userId: user.id,
+      });
+      return;
+    }
+
+    if (existingUser.emailVerifiedAt) {
+      logger.info("Verification email skipped: User is already verified", {
+        userId: user.id,
+        email: existingUser.email,
+      });
+      return;
+    }
+
+    const token = await this.createVerificationToken(existingUser.id);
     const result = await sendVerificationEmail({
-      to: user.email,
-      name: user.name,
+      to: existingUser.email,
+      name: existingUser.name,
       token,
     });
 
     if (!result.success) {
       logger.warn(
-        `Failed to send verification email to ${user.email}: ${result.error}`
+        `Failed to send verification email to ${existingUser.email}: ${result.error}`
       );
     }
   }
@@ -631,6 +658,8 @@ export class AuthService {
 
   /**
    * Resend a verification email to a registered user.
+   * Checks database first. If the email does not exist in DB or is already verified,
+   * sending is silently suppressed to prevent user enumeration attacks.
    */
   public async resendVerificationEmail(email: string): Promise<void> {
     const normalizedEmail = (email || "").toLowerCase().trim();
@@ -654,15 +683,19 @@ export class AuthService {
       .limit(1);
 
     if (!user) {
-      const err: any = new Error("No account found with this email address");
-      err.status = 404;
-      throw err;
+      logger.info(
+        "Resend verification suppressed: Email not found in database",
+        { email: normalizedEmail }
+      );
+      return;
     }
 
     if (user.emailVerifiedAt) {
-      const err: any = new Error("This email is already verified");
-      err.status = 400;
-      throw err;
+      logger.info(
+        "Resend verification suppressed: User is already verified",
+        { email: user.email }
+      );
+      return;
     }
 
     await this.sendVerificationEmailForUser(user);

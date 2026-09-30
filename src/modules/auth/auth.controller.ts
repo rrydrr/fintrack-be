@@ -509,7 +509,8 @@ export const authController = new Elysia({ prefix: "/auth" })
         await authService.resendVerificationEmail(body.email);
         return {
           success: true,
-          message: "Verification email sent successfully. Please check your inbox.",
+          message:
+            "If your email is registered, a verification link has been sent. Please check your inbox.",
         };
       } catch (err: any) {
         set.status = err.status || 500;
