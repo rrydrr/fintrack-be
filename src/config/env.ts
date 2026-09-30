@@ -9,12 +9,18 @@ export const config = {
   // Database
   databaseUrl: process.env.DATABASE_URL || "",
 
-  // Database Seeding / Admin Defaults
+  // Database Seeding / Defaults
   seedAdminEmail: process.env.SEED_ADMIN_EMAIL || process.env.ADMIN_EMAIL || "admin@fintrack.local",
   seedAdminPassword:
     process.env.SEED_ADMIN_PASSWORD ||
     process.env.ADMIN_DEFAULT_PASSWORD ||
     process.env.ADMIN_PASSWORD ||
+    "ChangeMe123!",
+  seedDemoEmail: process.env.SEED_DEMO_EMAIL || process.env.DEMO_EMAIL || "demo@fintrack.local",
+  seedDemoPassword:
+    process.env.SEED_DEMO_PASSWORD ||
+    process.env.DEMO_DEFAULT_PASSWORD ||
+    process.env.DEMO_PASSWORD ||
     "ChangeMe123!",
 
   // Authentication & JWT

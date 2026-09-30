@@ -33,8 +33,8 @@ const SEED_USERS: SeedUser[] = [
   },
   {
     name: "Demo User",
-    email: "demo@fintrack.local",
-    password: "ChangeMe123!",
+    email: config.seedDemoEmail,
+    password: config.seedDemoPassword,
     role: "user",
     defaultCurrency: "IDR",
   },
