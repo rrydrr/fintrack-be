@@ -13,6 +13,7 @@ export const inviteCodes = authSchema.table(
     usedBy: uuid("used_by").references(() => users.id, { onDelete: "set null" }),
     expiresAt: timestamp("expires_at").notNull(),
     usedAt: timestamp("used_at"),
+    deletedAt: timestamp("deleted_at"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
       .defaultNow()
@@ -22,6 +23,7 @@ export const inviteCodes = authSchema.table(
   (table) => [
     index("invite_codes_code_idx").on(table.code),
     index("invite_codes_created_by_idx").on(table.createdBy),
+    index("invite_codes_deleted_at_idx").on(table.deletedAt),
   ]
 );
 

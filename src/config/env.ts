@@ -38,5 +38,7 @@ export const config = {
   brevoApiKey: (process.env.BREVO_API_KEY || "").trim(),
   brevoSenderName: process.env.BREVO_SENDER_NAME || "FinTrack",
   brevoSenderEmail: process.env.BREVO_SENDER_EMAIL || "no-reply@yourdomain.com",
+  emailLogoUrl:
+    process.env.EMAIL_LOGO_URL || "https://r2-forwarder.rrydrr.my.id/public/logo.png",
 };
 

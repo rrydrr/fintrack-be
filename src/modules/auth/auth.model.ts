@@ -69,6 +69,7 @@ export const InviteCodeModel = t.Object({
   usedBy: t.Nullable(t.String({ description: "Redeemer user ID" })),
   expiresAt: t.String({ description: "Expiration timestamp" }),
   usedAt: t.Nullable(t.String({ description: "Usage timestamp" })),
+  deletedAt: t.Nullable(t.String({ description: "Revocation timestamp" })),
   createdAt: t.String({ description: "Creation timestamp" }),
 });
 
@@ -90,6 +91,14 @@ export const CreateInviteResponseModel = t.Object({
   data: t.Optional(InviteCodeModel),
   error: t.Optional(t.String()),
 });
+
+export const ListInvitesQueryModel = t.Optional(
+  t.Object({
+    includeDeleted: t.Optional(
+      t.BooleanString({ description: "Include revoked/soft-deleted invite codes (default: false)" })
+    ),
+  })
+);
 
 export const ListInvitesResponseModel = t.Object({
   success: t.Boolean(),

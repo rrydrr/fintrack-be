@@ -48,6 +48,12 @@ export class AuthService {
       throw err;
     }
 
+    if (invite.deletedAt) {
+      const err: any = new Error("Invite code has been revoked");
+      err.status = 400;
+      throw err;
+    }
+
     if (invite.usedAt) {
       const err: any = new Error("Invite code has already been used");
       err.status = 400;
@@ -181,7 +187,8 @@ export class AuthService {
   // Delegated invite methods
   public createInviteCode = (adminUserId: string, expiresInDays = 7) =>
     inviteService.createInviteCode(adminUserId, expiresInDays);
-  public listInviteCodes = () => inviteService.listInviteCodes();
+  public listInviteCodes = (includeDeleted?: boolean) =>
+    inviteService.listInviteCodes(includeDeleted);
   public revokeInviteCode = (inviteId: string) => inviteService.revokeInviteCode(inviteId);
 
   // Delegated email verification methods

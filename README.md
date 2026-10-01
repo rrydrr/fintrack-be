@@ -253,9 +253,9 @@ All endpoints support JSON error formatting and automatic TypeBox validation.
 - `PUT /auth/me/currency` — Update user's preferred base currency.
 - `POST /auth/verify-email` — Verify email address with one-time verification token.
 - `POST /auth/resend-verification` — Request a new email verification token.
-- `GET /auth/invites` — *(Admin only)* List all generated invite codes and usage stats.
-- `POST /auth/invites` — *(Admin only)* Create new invite codes with custom usage limits.
-- `DELETE /auth/invites/:id` — *(Admin only)* Revoke an invite code.
+- `GET /auth/invites` — *(Admin only)* List generated invite codes (supports `?includeDeleted=true`).
+- `POST /auth/invites` — *(Admin only)* Create new invite codes with custom expiration limits.
+- `DELETE /auth/invites/:id` — *(Admin only)* Soft delete / revoke an active unused invite code.
 
 ### 2. Financial Accounts & Net Worth (`/accounts`)
 - `GET /accounts` — List all user accounts with current balances.

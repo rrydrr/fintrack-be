@@ -2,6 +2,7 @@ import { Elysia, t } from "elysia";
 import {
   CreateInviteBodyModel,
   CreateInviteResponseModel,
+  ListInvitesQueryModel,
   ListInvitesResponseModel,
   RevokeInviteResponseModel,
 } from "../auth.model";
@@ -37,8 +38,9 @@ export const inviteController = new Elysia({ prefix: "/invites" })
   )
   .get(
     "/",
-    async () => {
-      const invites = await inviteService.listInviteCodes();
+    async ({ query }) => {
+      const includeDeleted = Boolean(query?.includeDeleted);
+      const invites = await inviteService.listInviteCodes(includeDeleted);
       return {
         success: true,
         data: invites,
@@ -46,6 +48,7 @@ export const inviteController = new Elysia({ prefix: "/invites" })
     },
     {
       roles: ["admin"],
+      query: ListInvitesQueryModel,
       response: ListInvitesResponseModel,
       detail: {
         summary: "List invite codes",
@@ -70,7 +73,7 @@ export const inviteController = new Elysia({ prefix: "/invites" })
       }),
       response: RevokeInviteResponseModel,
       detail: {
-        summary: "Revoke invite code",
+        summary: "Revoke invite code (soft delete)",
         tags: ["Auth"],
         security: [{ cookieAuth: [] }],
       },

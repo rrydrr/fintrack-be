@@ -132,7 +132,25 @@ export async function sendEmail(options: SendEmailOptions): Promise<SendEmailRes
 }
 
 /**
- * Base email layout wrapper with FinTrack light mode styling
+ * Helper to render the brand logo in emails using the public R2 hosted asset.
+ */
+function renderBrandLogo(): string {
+  const logoUrl =
+    config.emailLogoUrl || "https://r2-forwarder.rrydrr.my.id/public/logo.png";
+
+  return `
+    <img
+      src="${logoUrl}"
+      alt="FinTrack"
+      width="38"
+      height="38"
+      style="display:block;width:38px;height:38px;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,0.18);border:0;outline:none;"
+    />
+  `.trim();
+}
+
+/**
+ * Base email layout wrapper with FinTrack modern frontend design system (Emerald, Cyan, Zinc, Obsidian)
  */
 function renderBaseTemplate(title: string, contentHtml: string): string {
   return `
@@ -143,27 +161,26 @@ function renderBaseTemplate(title: string, contentHtml: string): string {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${title}</title>
 </head>
-<body style="margin:0;padding:0;background-color:#f8fafc;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;color:#334155;">
-  <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color:#f8fafc;padding:48px 16px;">
+<body style="margin:0;padding:0;background-color:#fafafa;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;color:#3f3f46;">
+  <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color:#fafafa;padding:48px 16px;">
     <tr>
       <td align="center">
-        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width:540px;background-color:#ffffff;border-radius:16px;border:1px solid #e2e8f0;overflow:hidden;box-shadow:0 4px 6px -1px rgba(0,0,0,0.05),0 10px 15px -3px rgba(0,0,0,0.04);">
-          <!-- Top Accent Line -->
+        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width:560px;background-color:#ffffff;border-radius:20px;border:1px solid #e4e4e7;overflow:hidden;box-shadow:0 10px 25px -5px rgba(0,0,0,0.05),0 8px 10px -6px rgba(0,0,0,0.03);">
+          <!-- Top Accent Line (Signature Emerald-to-Cyan Gradient) -->
           <tr>
-            <td style="height:4px;background:linear-gradient(90deg,#2563eb 0%,#3b82f6 50%,#60a5fa 100%);"></td>
+            <td style="height:4px;background:linear-gradient(90deg,#059669 0%,#10b981 50%,#06b6d4 100%);"></td>
           </tr>
           <!-- Header -->
           <tr>
-            <td style="padding:28px 36px 20px 36px;border-bottom:1px solid #f1f5f9;">
+            <td style="padding:28px 36px 22px 36px;border-bottom:1px solid #f4f4f5;">
               <table border="0" cellspacing="0" cellpadding="0">
                 <tr>
                   <td style="vertical-align:middle;padding-right:12px;">
-                    <div style="width:36px;height:36px;background:linear-gradient(135deg,#2563eb 0%,#1d4ed8 100%);border-radius:10px;text-align:center;line-height:36px;box-shadow:0 2px 6px rgba(37,99,235,0.25);">
-                      <span style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:18px;font-weight:800;color:#ffffff;display:inline-block;line-height:36px;">F</span>
-                    </div>
+                    ${renderBrandLogo()}
                   </td>
                   <td style="vertical-align:middle;">
-                    <span style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:18px;font-weight:700;letter-spacing:-0.5px;color:#0f172a;line-height:1.2;">FinTrack</span>
+                    <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:19px;font-weight:700;letter-spacing:-0.5px;color:#09090b;line-height:1.2;">FinTrack</div>
+                    <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:11px;color:#71717a;letter-spacing:0.1px;margin-top:2px;">Intelligent financial &amp; receipt tracking</div>
                   </td>
                 </tr>
               </table>
@@ -171,16 +188,16 @@ function renderBaseTemplate(title: string, contentHtml: string): string {
           </tr>
           <!-- Body -->
           <tr>
-            <td style="padding:36px;font-size:15px;line-height:1.6;color:#334155;">
+            <td style="padding:36px;font-size:15px;line-height:1.6;color:#3f3f46;">
               ${contentHtml}
             </td>
           </tr>
           <!-- Footer -->
           <tr>
-            <td style="padding:24px 36px;background-color:#f8fafc;border-top:1px solid #f1f5f9;text-align:center;font-size:12px;color:#94a3b8;line-height:1.6;">
-              <p style="margin:0 0 6px 0;color:#64748b;font-weight:500;">FinTrack &bull; Smart Financial &amp; Receipt Tracking</p>
-              <p style="margin:0 0 4px 0;">This is an automated notification. Replies to this email are not monitored.</p>
-              <p style="margin:0;">&copy; ${new Date().getFullYear()} FinTrack. All rights reserved.</p>
+            <td style="padding:24px 36px;background-color:#fafafa;border-top:1px solid #f4f4f5;text-align:center;font-size:12px;color:#71717a;line-height:1.6;">
+              <p style="margin:0 0 6px 0;color:#52525b;font-weight:600;">FinTrack &bull; Modern Personal Finance &amp; Asset Management</p>
+              <p style="margin:0 0 4px 0;color:#a1a1aa;">This is an automated notification. Replies to this email are not monitored.</p>
+              <p style="margin:0;color:#a1a1aa;">&copy; ${new Date().getFullYear()} FinTrack. All rights reserved.</p>
             </td>
           </tr>
         </table>
@@ -199,32 +216,85 @@ export async function sendInviteEmail(options: {
   to: string;
   inviteCode: string;
   inviterName?: string;
+  recipientName?: string;
   registerUrl?: string;
 }): Promise<SendEmailResult> {
-  const inviterText = options.inviterName ? `<strong>${options.inviterName}</strong> has invited you` : "You have been invited";
+  const inviterText = options.inviterName
+    ? `<strong style="color:#09090b;">${options.inviterName}</strong> has invited you`
+    : "You have been invited";
+  const greeting = options.recipientName ? `Hello ${options.recipientName},` : "Hello,";
   const registerLink = options.registerUrl || `${config.frontendUrl}/register`;
+  const registerWithCode = `${registerLink}?code=${encodeURIComponent(options.inviteCode)}`;
 
   const contentHtml = `
-    <h2 style="margin:0 0 16px 0;color:#0f172a;font-size:22px;font-weight:700;letter-spacing:-0.5px;line-height:1.3;">You're Invited to FinTrack!</h2>
-    <p style="margin:0 0 20px 0;font-size:15px;line-height:1.6;color:#334155;">${inviterText} to join the FinTrack workspace to scan receipts and manage finances with AI assistance.</p>
+    <div style="margin-bottom:8px;">
+      <span style="display:inline-block;padding:4px 10px;background-color:#ecfdf5;border:1px solid #a7f3d0;border-radius:9999px;font-size:11px;font-weight:600;letter-spacing:0.5px;color:#059669;text-transform:uppercase;">
+        Exclusive Invitation
+      </span>
+    </div>
+    <h2 style="margin:8px 0 16px 0;color:#09090b;font-size:24px;font-weight:700;letter-spacing:-0.5px;line-height:1.3;">Join FinTrack Workspace</h2>
+    <p style="margin:0 0 8px 0;font-size:15px;line-height:1.6;color:#3f3f46;">${greeting}</p>
+    <p style="margin:0 0 24px 0;font-size:15px;line-height:1.6;color:#52525b;">${inviterText} to create an account on <strong>FinTrack</strong> — an intelligent dashboard designed to track wealth, monitor multi-currency accounts, and itemize receipts with AI assistance.</p>
     
-    <div style="margin:28px 0;padding:24px 20px;background-color:#eff6ff;border-radius:12px;border:1.5px dashed #93c5fd;text-align:center;">
-      <div style="font-size:12px;text-transform:uppercase;letter-spacing:1px;font-weight:600;color:#2563eb;margin-bottom:8px;">Your Invitation Code</div>
-      <div style="font-size:28px;font-weight:700;letter-spacing:4px;color:#1e40af;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;">${options.inviteCode}</div>
+    <!-- Voucher / Invitation Code Box matching frontend styling -->
+    <div style="margin:28px 0;padding:24px 20px;background-color:#f0fdf4;border-radius:16px;border:1.5px dashed #6ee7b7;text-align:center;">
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:1.5px;font-weight:700;color:#059669;margin-bottom:8px;">
+        Your Personal Invite Code
+      </div>
+      <div style="font-size:30px;font-weight:800;letter-spacing:5px;color:#065f46;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;margin-bottom:6px;">
+        ${options.inviteCode}
+      </div>
+      <div style="font-size:12px;color:#047857;font-weight:500;">
+        One-time registration code &bull; Valid for 7 days
+      </div>
     </div>
 
-    <p style="margin:0 0 28px 0;font-size:14px;color:#64748b;line-height:1.5;text-align:center;">Use this code when creating your account to unlock instant access.</p>
-
-    <div style="text-align:center;margin-bottom:16px;">
-      <a href="${registerLink}?code=${encodeURIComponent(options.inviteCode)}" target="_blank" style="display:inline-block;padding:14px 32px;background:linear-gradient(135deg,#2563eb 0%,#1d4ed8 100%);color:#ffffff;text-decoration:none;border-radius:10px;font-weight:600;font-size:15px;letter-spacing:0.2px;box-shadow:0 4px 12px rgba(37,99,235,0.25);">
+    <!-- Call To Action Button matching frontend emerald style -->
+    <div style="text-align:center;margin:32px 0 24px 0;">
+      <a href="${registerWithCode}" target="_blank" style="display:inline-block;padding:14px 36px;background:linear-gradient(135deg,#059669 0%,#10b981 100%);background-color:#059669;color:#ffffff;text-decoration:none;border-radius:12px;font-weight:600;font-size:15px;letter-spacing:0.2px;box-shadow:0 4px 14px rgba(16,185,129,0.35);text-align:center;">
         Create Your Account &rarr;
       </a>
+    </div>
+
+    <!-- Feature highlights container matching frontend cards -->
+    <div style="margin:28px 0;padding:20px;background-color:#fafafa;border-radius:14px;border:1px solid #f4f4f5;">
+      <div style="color:#09090b;font-weight:600;font-size:13px;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.5px;">
+        What you get with FinTrack:
+      </div>
+      <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+          <td style="padding-bottom:10px;font-size:13px;line-height:1.5;color:#52525b;">
+            <strong style="color:#09090b;">🧾 Smart AI Receipt Extraction</strong><br>
+            Instantly map photos of receipts into itemized transactions and taxes.
+          </td>
+        </tr>
+        <tr>
+          <td style="padding-bottom:10px;font-size:13px;line-height:1.5;color:#52525b;">
+            <strong style="color:#09090b;">📊 Real-Time Wealth &amp; Net Worth</strong><br>
+            Aggregate balances across banks, investments, and liabilities in your base currency.
+          </td>
+        </tr>
+        <tr>
+          <td style="font-size:13px;line-height:1.5;color:#52525b;">
+            <strong style="color:#09090b;">💱 Multi-Currency Architecture</strong><br>
+            Live exchange rate conversions across global currencies.
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Direct Link Fallback -->
+    <div style="border-top:1px solid #f4f4f5;padding-top:20px;margin-top:20px;">
+      <p style="margin:0 0 8px 0;font-size:12px;color:#71717a;line-height:1.5;">Button not working? Copy and paste this link into your browser:</p>
+      <div style="padding:10px 14px;background-color:#fafafa;border-radius:8px;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:12px;color:#059669;word-break:break-all;border:1px solid #e4e4e7;">
+        <a href="${registerWithCode}" style="color:#059669;text-decoration:none;">${registerWithCode}</a>
+      </div>
     </div>
   `;
 
   return sendEmail({
     to: options.to,
-    subject: "You've been invited to FinTrack",
+    subject: "You've been invited to FinTrack! 🎉",
     htmlContent: renderBaseTemplate("FinTrack Invitation", contentHtml),
     tags: ["invite", "onboarding"],
   });
@@ -242,34 +312,34 @@ export async function sendWelcomeEmail(options: {
   const dashboardLink = options.dashboardUrl || `${config.frontendUrl}/dashboard`;
 
   const contentHtml = `
-    <h2 style="margin:0 0 16px 0;color:#0f172a;font-size:22px;font-weight:700;letter-spacing:-0.5px;line-height:1.3;">${greeting}</h2>
-    <p style="margin:0 0 20px 0;font-size:15px;line-height:1.6;color:#334155;">Your account is ready. FinTrack makes it effortless to capture receipts, automatically organize expenses, and see your financial health in real time.</p>
+    <h2 style="margin:0 0 16px 0;color:#09090b;font-size:24px;font-weight:700;letter-spacing:-0.5px;line-height:1.3;">${greeting}</h2>
+    <p style="margin:0 0 20px 0;font-size:15px;line-height:1.6;color:#3f3f46;">Your account is ready. FinTrack makes it effortless to capture receipts, automatically organize expenses, and see your financial health in real time.</p>
 
-    <div style="margin:24px 0;padding:20px 24px;background-color:#f8fafc;border-radius:12px;border:1px solid #e2e8f0;">
-      <div style="color:#0f172a;font-weight:600;font-size:14px;margin-bottom:12px;">
+    <div style="margin:24px 0;padding:20px 24px;background-color:#fafafa;border-radius:14px;border:1px solid #f4f4f5;">
+      <div style="color:#09090b;font-weight:600;font-size:14px;margin-bottom:12px;">
         ✨ Quick Start Guide:
       </div>
       <table border="0" cellpadding="0" cellspacing="0" width="100%">
         <tr>
-          <td style="padding-bottom:10px;font-size:14px;line-height:1.5;color:#475569;">
-            <strong style="color:#0f172a;">1. Snap or Upload:</strong> Take a photo of any receipt or bill.
+          <td style="padding-bottom:10px;font-size:14px;line-height:1.5;color:#52525b;">
+            <strong style="color:#09090b;">1. Snap or Upload:</strong> Take a photo of any receipt or bill.
           </td>
         </tr>
         <tr>
-          <td style="padding-bottom:10px;font-size:14px;line-height:1.5;color:#475569;">
-            <strong style="color:#0f172a;">2. AI Processing:</strong> Line items, totals, and categories are parsed instantly.
+          <td style="padding-bottom:10px;font-size:14px;line-height:1.5;color:#52525b;">
+            <strong style="color:#09090b;">2. AI Processing:</strong> Line items, totals, and categories are parsed instantly.
           </td>
         </tr>
         <tr>
-          <td style="font-size:14px;line-height:1.5;color:#475569;">
-            <strong style="color:#0f172a;">3. Track &amp; Optimize:</strong> Monitor budgets and net worth across multiple currencies.
+          <td style="font-size:14px;line-height:1.5;color:#52525b;">
+            <strong style="color:#09090b;">3. Track &amp; Optimize:</strong> Monitor budgets and net worth across multiple currencies.
           </td>
         </tr>
       </table>
     </div>
 
     <div style="text-align:center;margin:32px 0 16px 0;">
-      <a href="${dashboardLink}" target="_blank" style="display:inline-block;padding:14px 32px;background:linear-gradient(135deg,#2563eb 0%,#1d4ed8 100%);color:#ffffff;text-decoration:none;border-radius:10px;font-weight:600;font-size:15px;letter-spacing:0.2px;box-shadow:0 4px 12px rgba(37,99,235,0.25);">
+      <a href="${dashboardLink}" target="_blank" style="display:inline-block;padding:14px 36px;background:linear-gradient(135deg,#059669 0%,#10b981 100%);background-color:#059669;color:#ffffff;text-decoration:none;border-radius:12px;font-weight:600;font-size:15px;letter-spacing:0.2px;box-shadow:0 4px 14px rgba(16,185,129,0.35);">
         Go to Dashboard &rarr;
       </a>
     </div>
@@ -297,26 +367,26 @@ export async function sendVerificationEmail(options: {
     options.verifyUrl || `${config.frontendUrl}/verify/${encodeURIComponent(options.token)}`;
 
   const contentHtml = `
-    <h2 style="margin:0 0 16px 0;color:#0f172a;font-size:22px;font-weight:700;letter-spacing:-0.5px;line-height:1.3;">Verify Your Email Address</h2>
-    <p style="margin:0 0 12px 0;font-size:15px;line-height:1.6;color:#334155;">${greeting}</p>
-    <p style="margin:0 0 24px 0;font-size:15px;line-height:1.6;color:#334155;">Thank you for signing up for FinTrack! Please confirm your email address by clicking the button below:</p>
+    <h2 style="margin:0 0 16px 0;color:#09090b;font-size:24px;font-weight:700;letter-spacing:-0.5px;line-height:1.3;">Verify Your Email Address</h2>
+    <p style="margin:0 0 12px 0;font-size:15px;line-height:1.6;color:#3f3f46;">${greeting}</p>
+    <p style="margin:0 0 24px 0;font-size:15px;line-height:1.6;color:#52525b;">Thank you for signing up for FinTrack! Please confirm your email address by clicking the button below:</p>
 
     <div style="text-align:center;margin:32px 0;">
-      <a href="${verificationLink}" target="_blank" style="display:inline-block;padding:14px 32px;background:linear-gradient(135deg,#2563eb 0%,#1d4ed8 100%);color:#ffffff;text-decoration:none;border-radius:10px;font-weight:600;font-size:15px;letter-spacing:0.2px;box-shadow:0 4px 12px rgba(37,99,235,0.25);">
+      <a href="${verificationLink}" target="_blank" style="display:inline-block;padding:14px 36px;background:linear-gradient(135deg,#059669 0%,#10b981 100%);background-color:#059669;color:#ffffff;text-decoration:none;border-radius:12px;font-weight:600;font-size:15px;letter-spacing:0.2px;box-shadow:0 4px 14px rgba(16,185,129,0.35);">
         Verify Email &rarr;
       </a>
     </div>
 
-    <div style="background-color:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:16px;margin:28px 0 24px 0;">
-      <p style="margin:0;font-size:13px;line-height:1.5;color:#64748b;">
-        <strong style="color:#334155;">Security Notice:</strong> If you did not request this verification, you can safely ignore this email.
+    <div style="background-color:#fafafa;border:1px solid #f4f4f5;border-radius:12px;padding:16px;margin:28px 0 24px 0;">
+      <p style="margin:0;font-size:13px;line-height:1.5;color:#71717a;">
+        <strong style="color:#09090b;">Security Notice:</strong> If you did not request this verification, you can safely ignore this email.
       </p>
     </div>
 
-    <div style="border-top:1px solid #f1f5f9;padding-top:20px;margin-top:20px;">
-      <p style="margin:0 0 8px 0;font-size:12px;color:#94a3b8;line-height:1.5;">Or copy and paste this link into your browser:</p>
-      <div style="padding:10px 14px;background-color:#f8fafc;border-radius:8px;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:12px;color:#2563eb;word-break:break-all;border:1px solid #e2e8f0;">
-        <a href="${verificationLink}" style="color:#2563eb;text-decoration:none;">${verificationLink}</a>
+    <div style="border-top:1px solid #f4f4f5;padding-top:20px;margin-top:20px;">
+      <p style="margin:0 0 8px 0;font-size:12px;color:#71717a;line-height:1.5;">Or copy and paste this link into your browser:</p>
+      <div style="padding:10px 14px;background-color:#fafafa;border-radius:8px;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:12px;color:#059669;word-break:break-all;border:1px solid #e4e4e7;">
+        <a href="${verificationLink}" style="color:#059669;text-decoration:none;">${verificationLink}</a>
       </div>
     </div>
   `;
